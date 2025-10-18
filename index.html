@@ -447,12 +447,17 @@ function renderQuiz(){
   if(q.type==='choice'){
     const C=[q.choice1,q.choice2,q.choice3,q.choice4];
     C.forEach((text, i)=>{
-      const btn=document.createElement('button');
-      btn.className='choice';
-      btn.innerHTML = `<span class="num">${numberToMaru(i+1)}</span> ${text||''}`;
-      btn.onclick=()=> onChoice(i+1, q, btn);
-      byId('choicesWrap').appendChild(btn);
-    })
+  const btn=document.createElement('button');
+  btn.className='choice';
+  const num = document.createElement('span');
+  num.className = 'num';
+  num.textContent = numberToMaru(i+1);
+  btn.appendChild(num);
+  btn.appendChild(document.createTextNode(' ' + (text || '')));
+  btn.onclick = ()=> onChoice(i+1, q, btn);
+  byId('choicesWrap').appendChild(btn);
+})
+
   }else{
     byId('freeWrap').classList.remove('hidden');
     byId('freeInput').value='';
@@ -494,14 +499,24 @@ function onChoice(n, q, btn){
 function onFreeSubmit(q){
   const input = byId('freeInput').value.trim();
   if(!input){ alert('回答を入力してください'); return }
-  let ok=false; const pat = (q.answer_pattern||'').trim();
-  if(pat.startsWith('/') && pat.endsWith('/i')){
-    const body = pat.slice(1,-2); const re = new RegExp(body,'i'); ok = re.test(input);
-  }else if(pat.startsWith('/') && pat.endsWith('/')){
-    const body = pat.slice(1,-1); const re = new RegExp(body); ok = re.test(input);
-  }else{
-    ok = input === pat || input === (q.correct||'');
+  let ok = false; 
+const pat = (q.answer_pattern || '').trim();
+
+if (pat.startsWith('/') && (pat.endsWith('/i') || pat.endsWith('/'))) {
+  const flags = pat.endsWith('/i') ? 'i' : '';
+  const body  = pat.slice(1, flags ? -2 : -1);
+  if (body.length <= 256) { // 過度な負荷やReDoSを抑止
+    try {
+      const re = new RegExp(body, flags);
+      ok = re.test(input);
+    } catch(e) { ok = false; }
   }
+}
+
+if (!ok) { // フォールバック：完全一致
+  ok = input === pat || input === (q.correct || '');
+}
+
   judgeAndShow(q, ok, `あなたの回答：${input}`);
   byId('freeInput').disabled = true; byId('freeSubmit').disabled=true;
 }
@@ -515,10 +530,38 @@ function judgeAndShow(q, ok, your){
 
   // answer panel
   byId('answerPanel').classList.remove('hidden');
-  byId('judgeLine').innerHTML = ok ? `<span class="right">◯ 正解！</span> <span class="muted">${your}</span>` : `<span class="wrongt">× 不正解</span> <span class="muted">${your}</span>`;
-  const correctDisplay = (q.type==='choice') ? `${numberToMaru(normalizeCorrect(q))}：${[q.choice1,q.choice2,q.choice3,q.choice4][normalizeCorrect(q)-1]}` : (q.correct||q.answer_pattern||'');
-  byId('answerText').innerHTML = `<div><b>正解：</b>${correctDisplay}</div><div style="margin-top:6px">${q.explanation||''}</div>`;
-  byId('nextBtn').disabled=false;
+
+// judgeLine を安全に生成
+const judge = byId('judgeLine');
+judge.textContent = '';
+const jl = document.createElement('span');
+jl.className = ok ? 'right' : 'wrongt';
+jl.textContent = ok ? '◯ 正解！' : '× 不正解';
+const yourSpan = document.createElement('span');
+yourSpan.className = 'muted';
+yourSpan.textContent = ` ${your}`;
+judge.appendChild(jl);
+judge.appendChild(document.createTextNode(' '));
+judge.appendChild(yourSpan);
+
+// answerText を安全に生成
+const answerText = byId('answerText');
+answerText.textContent = '';
+const correctDisplay = (q.type === 'choice')
+  ? `${numberToMaru(normalizeCorrect(q))}：${[q.choice1,q.choice2,q.choice3,q.choice4][normalizeCorrect(q)-1]}`
+  : (q.correct || q.answer_pattern || '');
+const c1 = document.createElement('div');
+const b  = document.createElement('b'); b.textContent = '正解：';
+c1.appendChild(b);
+c1.appendChild(document.createTextNode(String(correctDisplay || '')));
+const c2 = document.createElement('div');
+c2.style.marginTop = '6px';
+c2.textContent = q.explanation || '';
+answerText.appendChild(c1);
+answerText.appendChild(c2);
+
+byId('nextBtn').disabled = false;
+
   updateProgressAndTrophy();
 }
 
@@ -552,6 +595,8 @@ function finishRun(){
 
 /*******************************\n * 問題管理テーブル
  *******************************/
+  const CHAPTER_OPTIONS = ['基礎','導入','運用'];
+　const FIELD_OPTIONS   = ['sAIサーチ','sAIチャット','共通'];
 function renderTable(){
   const tbody = byId('qTbody'); tbody.innerHTML='';
   questions.forEach((q,i)=>{
@@ -582,13 +627,28 @@ function renderTable(){
 
 function cell(key, value, idx, readonly=false, max=0){
   const v = value==null? '' : value;
-  if(key==='type'){
-    return `<td><select data-idx="${idx}" data-key="type"><option value="choice" ${v==='choice'?'selected':''}>choice</option><option value="free" ${v==='free'?'selected':''}>free</option></select></td>`
+
+  // ▼ 章・分野・形式はセレクト表示
+  if (key==='type' || key==='chapter' || key==='field') {
+    if (key==='type') {
+      return `<td><select data-idx="${idx}" data-key="type">
+        <option value="choice" ${v==='choice'?'selected':''}>choice</option>
+        <option value="free"   ${v==='free'  ?'selected':''}>free</option>
+      </select></td>`;
+    }
+    const opts = key==='chapter' ? CHAPTER_OPTIONS : FIELD_OPTIONS;
+    return `<td><select data-idx="${idx}" data-key="${key}">`
+      + opts.map(o=>`<option value="${o}" ${v===o?'selected':''}>${o}</option>`).join('')
+      + `</select></td>`;
   }
+
   const tag = (String(v).length>40 || max>=36) ? 'textarea' : 'input';
   const attrs = `${readonly?'readonly':''} data-idx="${idx}" data-key="${key}" ${max?`maxlength="${max*4}"`:''}`;
-  return `<td>${tag==='input'? `<input value="${escapeHtml(v)}" ${attrs}/>` : `<textarea rows="2" ${attrs}>${escapeHtml(v)}</textarea>`}</td>`
+  return `<td>${tag==='input'
+    ? `<input value="${escapeHtml(v)}" ${attrs}/>`
+    : `<textarea rows="2" ${attrs}>${escapeHtml(v)}</textarea>`}</td>`;
 }
+
 
 function onCellChange(e){
   const el=e.target; const idx=+el.dataset.idx; const key=el.dataset.key; const v=el.value;
@@ -689,10 +749,15 @@ function downloadCsv(filename, rows){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click();
 }
 function csvEscape(v){
-  const s=String(v??'');
-  if(s.includes(',')||s.includes('"')||s.includes('\n')) return '"'+s.replace(/"/g,'""')+'"';
+  let s = String(v ?? '');
+  // Excel 式インジェクション対策：=,+,-,@ で始まる場合は先頭に ' を付与
+  if (/^[=+\-@]/.test(s)) s = "'" + s;
+  if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+    return '"' + s.replace(/"/g,'""') + '"';
+  }
   return s;
 }
+
 
 function downloadTemplate(){
   const rows = [
