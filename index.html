@@ -58,7 +58,8 @@
     .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid var(--btn-border);color:var(--muted)}
 
     .hero{
-      padding:18px 18px 8px; border-radius:18px; position:relative; overflow:hidden; background: radial-gradient(1200px 200px at 50% -120px, rgba(34,211,238,.25), transparent),
+      /* 旧）padding:18px 18px 8px; を下記に置換 */
+padding: 18px 160px 8px 18px; border-radius:18px; position:relative; overflow:hidden; background: radial-gradient(1200px 200px at 50% -120px, rgba(34,211,238,.25), transparent),
         linear-gradient(180deg, rgba(167,139,250,.18), rgba(255,255,255,0.04));
       border:1px solid rgba(167,139,250,.35);
     }
@@ -286,6 +287,28 @@ body{ background: transparent !important; }
 
 /* 番号バッジの枠も少し明るく */
 .choice .num{ border-color: rgba(255,255,255,.45) !important; }
+/* ヒーローに重ねるマスコット */
+.mascot-hero{
+  position: absolute;
+  right: 12px;
+  bottom: -6px;
+  width: 120px;
+  max-width: 30%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;         /* クリック操作を邪魔しない */
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.25));
+}
+
+/* スマホで少し小さく */
+@media (max-width:640px){
+  .hero{ padding: 14px 96px 8px 14px; }
+  .mascot-hero{ width: 86px; right: 8px; bottom: -4px; }
+}
+@media (max-width:420px){
+  .hero{ padding: 12px 84px 8px 12px; }
+  .mascot-hero{ width: 72px; }
+}
 
   </style>
   <!-- CSV & Excel parsers -->
@@ -314,6 +337,7 @@ body{ background: transparent !important; }
         <div class="tag">目的：sAIサーチ / sAIチャットの知識定着</div>
         <h1>1問1答で学習！</h1>
         <p>「選択式」「特定分野」「記述式」から学習モードを選んでください。途中で離れても進捗と問題データは自動保存されます。</p>
+        <img class="mascot-hero" src="./mascot.png" alt="サイシード・マスコット">
       </div>
 
       <div class="grid cols-3 menu">
