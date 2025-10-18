@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="Content-Security-Policy"
-  content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests">
+ 
   <title>sAIサーチ / sAIチャット 学習クイズ</title>
   <style>
     
@@ -217,8 +216,8 @@ textarea.choice:disabled {
         <div id="qText" class="qtitle"></div>
         <div id="choicesWrap"></div>
         <div id="freeWrap" class="hidden" style="display:flex; gap:8px; margin-top:10px">
-          <input id="freeInput" class="choice" placeholder="ここに回答を入力" />
-
+          <input id="freeInput" class="choice" placeholder="ここに回答を入力"
+  inputmode="text" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" />
 
           <button id="freeSubmit" class="btn">回答する</button>
         </div>
