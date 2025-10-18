@@ -601,7 +601,37 @@ function saveAll(){
   storage.set('sai-quiz-questions', questions);
   storage.set('sai-quiz-state', state);
   storage.set('sai-quiz-trophies', state.trophies);
+  storage.set('sai-quiz-bookmarks', bookmarks);
+  storage.set('sai-quiz-progress', progress);
+  storage.set('sai-quiz-settings', settings);
 }
+
+  function applySettings(){
+  document.body.classList.toggle('high-contrast', !!settings.highContrast);
+  document.body.classList.toggle('reduce-motion', !!settings.reduceMotion);
+  document.documentElement.style.setProperty('--ui-scale', settings.scale || 1);
+}
+applySettings();
+
+  function getWrongList(){
+  return questions.filter(q=> {
+    const p = progress[q.id]; return p && p.attempts>0 && p.lastOk===false;
+  });
+}
+function getBookmarkedList(){
+  return questions.filter(q=> bookmarks[q.id]);
+}
+function getDueList(){
+  const now = Date.now(), day = 86400000;
+  const iv = {1:0, 2:1, 3:2, 4:4, 5:7}; // box→日
+  return questions.filter(q=>{
+    const p = progress[q.id]; if(!p) return false;
+    const wait = (iv[p.box||1]||0)*day;
+    return !p.last || (now - p.last) >= wait;
+  });
+}
+
+
 
 /*******************************\n * 画面切替と共通UI
  *******************************/
@@ -654,7 +684,20 @@ function refreshHome(){
     </div>`;
     tw.appendChild(card);
   })
+  const wrongCount = getWrongList().length;
+const bmCount = getBookmarkedList().length;
+const dueCount = getDueList().length;
+const r = byId('reviewCounts');
+if(r) r.textContent = `復習できる件数：間違い ${wrongCount} / ブックマーク ${bmCount} / 今日の復習 ${dueCount}`;
+
 }
+  byId('startWrongBtn').onclick = ()=> startQuiz({ filter: q=> getWrongList().includes(q), modeLabel:'復習（間違え）' });
+byId('startBookmarkedBtn').onclick = ()=> startQuiz({ filter: q=> bookmarks[q.id], modeLabel:'復習（ブックマーク）' });
+byId('startDueBtn').onclick = ()=> {
+  const set = new Set(getDueList().map(q=>q.id));
+  startQuiz({ filter: q=> set.has(q.id), modeLabel:'今日の復習' });
+};
+
 
 /*******************************\n * クイズ実行
  *******************************/
