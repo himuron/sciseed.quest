@@ -438,13 +438,13 @@ body{ background: transparent !important; }
       <div class="card">
         <div class="section-title">Excel/CSV 記入ルール</div>
         <ol style="line-height:1.8">
-          <li>1行目は必ずヘッダーにしてください：<code>id,chapter,field,type,question,choice1,choice2,choice3,choice4,correct,answer_pattern,explanation</code></li>
-          <li><b>type</b> は <code>choice</code>（選択式） または <code>free</code>（記述）に限定します。</li>
-          <li>選択式（choice）の場合：<br>・<b>choice1〜choice4</b> をすべて埋める。<br>・<b>correct</b> は <u>1〜4 / ①〜④ / A〜D / 選択肢本文いずれか</u>で指定可能（例：<code>2</code> または <code>②</code> または <code>B</code> または <code>選択肢の本文</code>）。</li>
-          <li>記述（free）の場合：<br>・<b>answer_pattern</b> を必ず入力。<u>完全一致の文字列</u> か <u>/.../i の正規表現</u> を使用可（例：<code>FAQ</code>、<code>/^faq$/i</code>）。<br>・<b>correct</b> は表示用に任意（模範解答を見せたい場合）。</li>
-          <li><b>id</b> はユニーク。空欄の場合は自動採番されます。</li>
+          <li>1行目は必ず以下ヘッダーをコピペしてください<code>id,chapter,field,type,question,choice1,choice2,choice3,choice4,correct,answer_pattern,explanation</code></li>
+          <li><b>type</b> は <code>choice</code>（選択式） または <code>free</code>（記述）のみです。</li>
+          <li>選択式（choice）の場合：<br>・<b>choice1〜choice4</b> をすべて埋める。<br>・<b>correct（正解）</b> は <u>1〜4 / ①〜④ / A〜D / 選択肢本文いずれか</u>で指定可能（例：<code>2</code> または <code>②</code> または <code>B</code> または <code>選択肢の本文</code>）。</li>
+          <li>記述（free）の場合：<br>・<b>answer_pattern</b> を必ず入力。<u>完全一致の文字列</u> か <u>/.../i の正規表現</u> を使用可（例：<code>FAQ</code>、<code>/^faq$/i</code>）。<br>・<b>correct</b> は表示用に任意（模範解答を表示したい場合）。</li>
+          <li><b>id</b> は自由に決めてください。空欄の場合は自動採番されます。</li>
           <li>文字列にカンマが含まれる場合は <b>"…"</b> で囲ってください（CSV）。Excelで保存すれば自動で処理されます。</li>
-          <li>空白のみの行は無視されます。形式エラーの行は取り込み時にスキップされ、画面に詳細が表示されます。</li>
+          <li>空白のみの行は無視します。形式エラーの行は取り込み時にスキップし、画面に詳細が表示されます。</li>
         </ol>
         <div class="controls">
           <button class="btn" id="helpBackBtn">ホーム</button>
