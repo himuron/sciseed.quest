@@ -309,21 +309,6 @@ body{ background: transparent !important; }
   .hero{ padding: 12px 84px 8px 12px; }
   .mascot-hero{ width: 72px; }
 }
-/* 設定：フォントスケール（既定16pxに倍率適用） */
-:root{ --ui-scale: 1; }
-body{ font-size: calc(16px * var(--ui-scale)); }
-
-/* 設定：高コントラスト（枠強化） */
-body.high-contrast .choice{ border-width:3px !important; border-color: rgba(255,255,255,.6) !important; }
-body.reduce-motion .big-mark{ transition: none; }
-
-/* ブックマーク状態の見た目 */
-#bookmarkBtn.booked{
-  background: linear-gradient(90deg, #fde68a, #fbbf24);
-  color: #0b1223;
-  border-color: transparent;
-  font-weight: 800;
-}
 
   </style>
   <!-- CSV & Excel parsers -->
@@ -585,11 +570,6 @@ const sampleQuestions = [
 /*******************************\n * アプリ状態
  *******************************/
 const state = storage.get('sai-quiz-state', {
-  let questions = storage.get('sai-quiz-questions', sampleQuestions);
-let bookmarks = storage.get('sai-quiz-bookmarks', {});           // id: true/false
-let progress  = storage.get('sai-quiz-progress', {});             // id: {attempts, corrects, last, lastOk, box}
-let settings  = storage.get('sai-quiz-settings', { scale:1, highContrast:false, reduceMotion:false });
-
   mode: 'home', // home | quiz | manage | help
   run: null,    // {modeLabel, list, index, chapter}
   trophies: storage.get('sai-quiz-trophies', {}),
@@ -601,37 +581,7 @@ function saveAll(){
   storage.set('sai-quiz-questions', questions);
   storage.set('sai-quiz-state', state);
   storage.set('sai-quiz-trophies', state.trophies);
-  storage.set('sai-quiz-bookmarks', bookmarks);
-  storage.set('sai-quiz-progress', progress);
-  storage.set('sai-quiz-settings', settings);
 }
-
-  function applySettings(){
-  document.body.classList.toggle('high-contrast', !!settings.highContrast);
-  document.body.classList.toggle('reduce-motion', !!settings.reduceMotion);
-  document.documentElement.style.setProperty('--ui-scale', settings.scale || 1);
-}
-applySettings();
-
-  function getWrongList(){
-  return questions.filter(q=> {
-    const p = progress[q.id]; return p && p.attempts>0 && p.lastOk===false;
-  });
-}
-function getBookmarkedList(){
-  return questions.filter(q=> bookmarks[q.id]);
-}
-function getDueList(){
-  const now = Date.now(), day = 86400000;
-  const iv = {1:0, 2:1, 3:2, 4:4, 5:7}; // box→日
-  return questions.filter(q=>{
-    const p = progress[q.id]; if(!p) return false;
-    const wait = (iv[p.box||1]||0)*day;
-    return !p.last || (now - p.last) >= wait;
-  });
-}
-
-
 
 /*******************************\n * 画面切替と共通UI
  *******************************/
@@ -684,20 +634,7 @@ function refreshHome(){
     </div>`;
     tw.appendChild(card);
   })
-  const wrongCount = getWrongList().length;
-const bmCount = getBookmarkedList().length;
-const dueCount = getDueList().length;
-const r = byId('reviewCounts');
-if(r) r.textContent = `復習できる件数：間違い ${wrongCount} / ブックマーク ${bmCount} / 今日の復習 ${dueCount}`;
-
 }
-  byId('startWrongBtn').onclick = ()=> startQuiz({ filter: q=> getWrongList().includes(q), modeLabel:'復習（間違え）' });
-byId('startBookmarkedBtn').onclick = ()=> startQuiz({ filter: q=> bookmarks[q.id], modeLabel:'復習（ブックマーク）' });
-byId('startDueBtn').onclick = ()=> {
-  const set = new Set(getDueList().map(q=>q.id));
-  startQuiz({ filter: q=> set.has(q.id), modeLabel:'今日の復習' });
-};
-
 
 /*******************************\n * クイズ実行
  *******************************/
