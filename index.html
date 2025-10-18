@@ -201,6 +201,28 @@ textarea.choice:disabled {
 @media (prefers-reduced-motion: reduce){
   .big-mark { transition: none; }
 }
+/* スマホ時：ヘッダー内ボタンを小さく調整 */
+@media (max-width: 640px){
+  .topbar{ padding: 6px 8px; gap: 6px; border-radius: 12px; }
+
+  /* ヘッダー内ボタンだけサイズを小さく（全体のボタン設定を上書き） */
+  .topbar .btn{
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  /* ステータスタグも小さめに */
+  .topbar .tag{
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  /* ロゴ周りの縮小 */
+  .logo{ font-size: 14px; gap: 6px; }
+  .logo .dot{ width: 8px; height: 8px; }
+}
 
   </style>
   <!-- CSV & Excel parsers -->
