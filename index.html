@@ -266,6 +266,36 @@ textarea.choice::placeholder {
 
 /* body本体は背景を持たせない（下の.page-bgを透過させる） */
 body{ background: transparent !important; }
+/* === 選択肢ボタンの枠を強調（背景と同化しないように） === */
+.choice{
+  border: 2px solid rgba(255,255,255,.28) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 6px 14px rgba(0,0,0,.18);
+}
+.choice:hover{
+  border-color: rgba(255,255,255,.45);
+  transform: translateY(-1px);
+}
+.choice:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(34,211,238,.45), inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+/* 正誤表示時も枠を明瞭に */
+.choice.correct{
+  border-color: rgba(16,185,129,.85) !important;
+  background: linear-gradient(180deg, rgba(16,185,129,.15), rgba(16,185,129,.08)) !important;
+}
+.choice.wrong{
+  border-color: rgba(239,68,68,.85) !important;
+  background: linear-gradient(180deg, rgba(239,68,68,.13), rgba(239,68,68,.06)) !important;
+}
+
+/* 番号バッジもコントラストを上げる */
+.choice .num{
+  border-color: rgba(255,255,255,.35) !important;
+  background: rgba(255,255,255,.06);
+}
 
   </style>
   <!-- CSV & Excel parsers -->
