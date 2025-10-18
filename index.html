@@ -266,6 +266,26 @@ textarea.choice::placeholder {
 
 /* body本体は背景を持たせない（下の.page-bgを透過させる） */
 body{ background: transparent !important; }
+/* === 選択肢の枠線を強調（背景は変更しない） === */
+.choice{
+  border-width: 2px !important;
+  border-color: rgba(255,255,255,.38) !important;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset; /* 軽い縁取りでコントラストUP */
+}
+.choice:hover{
+  border-color: rgba(255,255,255,.55) !important;
+}
+.choice:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(34,211,238,.45), 0 0 0 1px rgba(0,0,0,.25) inset;
+}
+
+/* 正誤時も枠だけ強調（背景はそのまま） */
+.choice.correct{ border-color: rgba(16,185,129,.9) !important; }
+.choice.wrong  { border-color: rgba(239,68,68,.9) !important; }
+
+/* 番号バッジの枠も少し明るく */
+.choice .num{ border-color: rgba(255,255,255,.45) !important; }
 
   </style>
   <!-- CSV & Excel parsers -->
