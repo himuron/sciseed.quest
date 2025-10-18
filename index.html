@@ -479,8 +479,7 @@ function renderQuiz(){
     byId('freeWrap').classList.remove('hidden');
     byId('freeInput').value='';
     byId('freeSubmit').onclick = ()=> onFreeSubmit(q);
-    const fi = byId('freeInput');
-fi.onkeydown = (e)=>{ if(e.key==='Enter'){ e.preventDefault(); onFreeSubmit(q); } };
+    
 
   }
   
