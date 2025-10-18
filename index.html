@@ -133,6 +133,74 @@ textarea.choice:disabled {
            background:rgba(31,47,82,.7); backdrop-filter:blur(6px);
            padding:10px 12px; border-radius:14px; }
 }
+/* === Mobile usability & visual polish === */
+
+/* タップしやすい最小サイズ・読みやすい文字サイズ */
+.btn, .choice, input.choice, textarea.choice, #qTable select {
+  min-height: 48px;
+  padding: 12px 16px;
+  font-size: 16px;
+  line-height: 1.25;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* 管理テーブルの入力UIも指で操作しやすく */
+#qTable input, #qTable textarea, #qTable select {
+  font-size: 16px;
+  min-height: 40px;
+}
+
+/* 選択肢の番号バッジを少し大きく */
+@media (max-width: 640px){
+  .choice .num { width: 32px; height: 32px; border-radius: 10px; }
+}
+
+/* ボタンを縦積み＆フル幅に（誤タップ防止） */
+@media (max-width: 640px){
+  .controls { flex-direction: column; gap: 8px; }
+  #qCard .controls .btn,
+  .menu .btn { width: 100%; }
+  #qCard .controls .btn.primary { width: 100%; }
+}
+
+/* スマホ時：トップバー固定、操作ボタン群を下部スティッキーに */
+@media (max-width: 640px){
+  .topbar{
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(255,255,255,.06);
+    backdrop-filter: blur(8px);
+    border-radius: 14px; padding: 10px 12px; margin-bottom: 12px;
+  }
+  #qCard { padding-bottom: 90px; }
+  #qCard .controls{
+    position: sticky; bottom: 8px;
+    background: rgba(31,47,82,.75);
+    border: 1px solid rgba(148,163,184,.25);
+    backdrop-filter: blur(8px);
+    padding: 10px; border-radius: 14px;
+  }
+}
+
+/* プログレスやピルもタッチ向けに拡大 */
+@media (max-width: 640px){
+  .progress { height: 14px; }
+  .pill { font-size: 13px; padding: 8px 10px; }
+  .card { padding: 14px; border-radius: 16px; }
+  .qtitle { font-size: 17px; }
+}
+
+/* フォーカス可視化（アクセシビリティ） */
+.btn:focus-visible, .choice:focus-visible, input.choice:focus-visible, textarea.choice:focus-visible, #qTable select:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(34,211,238,.5);
+  border-color: rgba(34,211,238,.6);
+}
+
+/* 端末の省モーション設定に追従 */
+@media (prefers-reduced-motion: reduce){
+  .big-mark { transition: none; }
+}
 
   </style>
   <!-- CSV & Excel parsers -->
