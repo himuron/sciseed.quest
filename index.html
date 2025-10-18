@@ -217,8 +217,8 @@ textarea.choice:disabled {
         <div id="qText" class="qtitle"></div>
         <div id="choicesWrap"></div>
         <div id="freeWrap" class="hidden" style="display:flex; gap:8px; margin-top:10px">
-          <input id="freeInput" class="choice" placeholder="ここに回答を入力"
-  　　　inputmode="text" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" />
+          <input id="freeInput" class="choice" placeholder="ここに回答を入力" />
+
 
           <button id="freeSubmit" class="btn">回答する</button>
         </div>
@@ -479,7 +479,9 @@ function renderQuiz(){
     byId('freeWrap').classList.remove('hidden');
     byId('freeInput').value='';
     byId('freeSubmit').onclick = ()=> onFreeSubmit(q);
-    
+    const fi = byId('freeInput');
+fi.onkeydown = (e)=>{ if(e.key==='Enter'){ e.preventDefault(); onFreeSubmit(q); } };
+
 
   }
   
