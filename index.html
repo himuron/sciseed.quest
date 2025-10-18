@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>sAIサーチ / sAIチャット 学習クイズ</title>
   <style>
+    
     :root{
       --bg:#0f172a;          /* slate-900 */
       --card:#0b1223;        /* slightly lighter */
@@ -100,6 +101,25 @@
     tbody tr:hover{background:rgba(255,255,255,.02)}
 
     .hidden{display:none}
+    /* 記述問題の入力文字色を明瞭にする（.hidden の直後に追記） */
+input.choice,
+textarea.choice {
+  color: var(--text);
+  caret-color: var(--text);
+}
+
+input.choice::placeholder,
+textarea.choice::placeholder {
+  color: var(--muted);
+  opacity: .9;
+}
+
+input.choice:disabled,
+textarea.choice:disabled {
+  color: var(--text);
+  opacity: .7;
+}
+
   </style>
   <!-- CSV & Excel parsers -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
