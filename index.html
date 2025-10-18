@@ -328,7 +328,6 @@ body{ background: transparent !important; }
         <span class="tag" id="statusTag">HOME</span>
         <button class="btn ghost" id="manageBtn">問題管理</button>
         <button class="btn ghost" id="helpBtn">ヘルプ/CSVテンプレート</button>
-        <button class="btn ghost" id="settingsBtn">設定</button>
       </div>
     </div>
 
@@ -362,16 +361,6 @@ body{ background: transparent !important; }
         <div class="section-title">トロフィー</div>
         <div id="trophyWrap" class="grid"></div>
       </div>
-      <div class="card">
-  <div class="section-title">復習モード</div>
-  <div class="controls">
-    <button class="btn" id="startWrongBtn">間違えた問題</button>
-    <button class="btn" id="startBookmarkedBtn">ブックマーク</button>
-    <button class="btn" id="startDueBtn">今日の復習（間隔反復）</button>
-  </div>
-  <div class="muted" id="reviewCounts" style="font-size:12px"></div>
-</div>
-
 
       <div class="card">
         <div class="section-title">データの入出力</div>
@@ -390,29 +379,6 @@ body{ background: transparent !important; }
     </section>
 
     <!-- QUIZ -->
-    <section id="settings" class="hidden">
-  <div class="card">
-    <div class="section-title">設定</div>
-    <div class="grid" style="gap:10px">
-      <label class="pill">フォントサイズ：
-        <select id="fontScaleSel">
-          <option value="1">標準</option>
-          <option value="1.1">やや大</option>
-          <option value="1.2">大</option>
-        </select>
-      </label>
-      <label class="pill"><input type="checkbox" id="highContrastChk"> 高コントラスト（枠強調）</label>
-      <label class="pill"><input type="checkbox" id="reducedMotionChk"> アニメーションを減らす</label>
-    </div>
-    <div class="controls" style="margin-top:10px">
-      <button class="btn" id="resetDataBtn">学習データをリセット</button>
-      <button class="btn ghost" id="backHomeFromSettings">ホーム</button>
-    </div>
-  </div>
-</section>
-
-
-    
     <section id="quiz" class="hidden">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap">
@@ -447,7 +413,6 @@ body{ background: transparent !important; }
         <div class="controls" style="margin-top:14px">
           <button class="btn" id="prevBtn">ひとつ前に戻る</button>
           <button class="btn" id="passBtn">この問題をパス</button>
-          <button class="btn" id="bookmarkBtn">★ ブックマーク</button>
           <button class="btn primary" id="nextBtn" disabled>次の問題へ</button>
           <button class="btn ghost" id="homeBtn">ホーム</button>
         </div>
