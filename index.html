@@ -16,8 +16,8 @@
       --ok:#10b981;          /* emerald-500 */
       --bad:#ef4444;         /* red-500 */
       --warn:#f59e0b;        /* amber-500 */
-      --btn:#1f2937;         /* gray-800 */
-      --btn-border:#334155;  /* slate-700 */
+      --btn:#2b3c55;         /* 少し明るいボタン地 */
+      --btn-border:#3e516d;  /* やや明るい枠線 */
       --ring: 14px;
     }
     *{box-sizing:border-box}
@@ -25,7 +25,7 @@
     body{
       margin:0;
       font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", system-ui, -apple-system, sans-serif;
-      background:linear-gradient(180deg, #0a0f1f 0%, #0f172a 100%);
+      background:linear-gradient(180deg, #12233e 0%, #1f2f52 100%);
       color:var(--text);
     }
     .container{max-width:980px;margin:0 auto;padding:20px}
@@ -36,7 +36,7 @@
     .logo{display:flex;align-items:center;gap:10px;font-weight:700}
     .logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
     .card{
-      background:rgba(255,255,255,0.03);
+      background:rgba(255,255,255,0.07);
       border:1px solid rgba(148,163,184,.25);
       border-radius:18px; padding:18px;
       box-shadow: 0 10px 30px rgba(0,0,0,.25);
@@ -66,7 +66,7 @@
 
     .menu button{width:100%; text-align:left}
 
-    .progress{height:10px;border-radius:999px;background:#0b1020;border:1px solid rgba(148,163,184,.25); overflow:hidden}
+    .progress{height:10px;border-radius:999px;background:#13233a;border:1px solid rgba(148,163,184,.25); overflow:hidden}
     .progress .bar{height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-2)); width:0}
 
     /* Question UI */
@@ -131,6 +131,7 @@ textarea.choice:disabled {
     <div class="topbar">
       <div class="logo"><span class="dot"></span> sAI 学習クイズ</div>
       <div style="display:flex; gap:8px; align-items:center">
+        <button class="btn ghost" id="homeTopBtn">ホーム</button>
         <span class="tag" id="statusTag">HOME</span>
         <button class="btn ghost" id="manageBtn">問題管理</button>
         <button class="btn ghost" id="helpBtn">ヘルプ/CSVテンプレート</button>
@@ -731,6 +732,7 @@ byId('startFreeBtn').onclick = ()=> startQuiz({ filter: q=> q.type==='free', mod
 byId('manageBtn').onclick = ()=>{ show('manage'); renderTable() };
 byId('backHomeFromManage').onclick = ()=>{ show('home'); refreshHome() };
 byId('helpBtn').onclick = ()=>{ show('help') };
+byId('homeTopBtn').onclick = ()=>{ show('home'); refreshHome() };
 byId('helpBackBtn').onclick = ()=>{ show('home'); refreshHome() };
 
 byId('importBtn').onclick = ()=> handleImport('replace');
