@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy"
+  content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests">
   <title>sAIサーチ / sAIチャット 学習クイズ</title>
   <style>
     
@@ -119,11 +121,24 @@ textarea.choice:disabled {
   color: var(--text);
   opacity: .7;
 }
+/* === Mobile friendly === */
+.btn{ min-height:44px; font-size:16px; }
+.choice{ min-height:44px; font-size:16px; }
+#qTable input, #qTable textarea, #qTable select{ font-size:16px; min-height:40px; }
+
+/* スマホ時のレイアウト最適化 */
+@media (max-width: 640px){
+  .controls{ flex-direction:column; }
+  .menu .btn{ width:100%; }
+  .topbar{ position:sticky; top:0; z-index:10;
+           background:rgba(31,47,82,.7); backdrop-filter:blur(6px);
+           padding:10px 12px; border-radius:14px; }
+}
 
   </style>
   <!-- CSV & Excel parsers -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+　<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+　<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
   <div class="big-mark" id="bigMark" aria-hidden="true"></div>
@@ -202,7 +217,9 @@ textarea.choice:disabled {
         <div id="qText" class="qtitle"></div>
         <div id="choicesWrap"></div>
         <div id="freeWrap" class="hidden" style="display:flex; gap:8px; margin-top:10px">
-          <input id="freeInput" class="choice" placeholder="ここに回答を入力" />
+          <input id="freeInput" class="choice" placeholder="ここに回答を入力"
+  　　　inputmode="text" enterkeyhint="done" autocomplete="off" autocapitalize="off" spellcheck="false" />
+
           <button id="freeSubmit" class="btn">回答する</button>
         </div>
 
@@ -462,7 +479,11 @@ function renderQuiz(){
     byId('freeWrap').classList.remove('hidden');
     byId('freeInput').value='';
     byId('freeSubmit').onclick = ()=> onFreeSubmit(q);
+    const fi = byId('freeInput');
+fi.onkeydown = (e)=>{ if(e.key==='Enter'){ e.preventDefault(); onFreeSubmit(q); } };
+
   }
+  
 
   // sub status
   const a = Object.values(run.answered);
@@ -746,7 +767,10 @@ function downloadCsv(filename, rows){
   const header = ['id','chapter','field','type','question','choice1','choice2','choice3','choice4','correct','answer_pattern','explanation'];
   const lines = [header.join(',')].concat(rows.map(r=> header.map(h=> csvEscape(r[h]??'')).join(',')));
   const blob = new Blob(["\ufeff"+lines.join('\n')], {type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click();
+　const url = URL.createObjectURL(blob);
+　const a = document.createElement('a'); a.href = url; a.download = filename;
+　document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+
 }
 function csvEscape(v){
   let s = String(v ?? '');
@@ -782,7 +806,10 @@ function downloadXlsxTemplate(){
   XLSX.utils.book_append_sheet(wb, ws, 'questions');
   const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
   const blob = new Blob([wbout], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sai_quiz_template.xlsx'; a.click();
+　const url = URL.createObjectURL(blob);
+　const a = document.createElement('a'); a.href = url; a.download = 'sai_quiz_template.xlsx';
+　document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+
 }
 
 /*******************************\n * ヘルパー
