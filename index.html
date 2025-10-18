@@ -309,6 +309,21 @@ body{ background: transparent !important; }
   .hero{ padding: 12px 84px 8px 12px; }
   .mascot-hero{ width: 72px; }
 }
+/* 設定：フォントスケール（既定16pxに倍率適用） */
+:root{ --ui-scale: 1; }
+body{ font-size: calc(16px * var(--ui-scale)); }
+
+/* 設定：高コントラスト（枠強化） */
+body.high-contrast .choice{ border-width:3px !important; border-color: rgba(255,255,255,.6) !important; }
+body.reduce-motion .big-mark{ transition: none; }
+
+/* ブックマーク状態の見た目 */
+#bookmarkBtn.booked{
+  background: linear-gradient(90deg, #fde68a, #fbbf24);
+  color: #0b1223;
+  border-color: transparent;
+  font-weight: 800;
+}
 
   </style>
   <!-- CSV & Excel parsers -->
@@ -570,6 +585,11 @@ const sampleQuestions = [
 /*******************************\n * アプリ状態
  *******************************/
 const state = storage.get('sai-quiz-state', {
+  let questions = storage.get('sai-quiz-questions', sampleQuestions);
+let bookmarks = storage.get('sai-quiz-bookmarks', {});           // id: true/false
+let progress  = storage.get('sai-quiz-progress', {});             // id: {attempts, corrects, last, lastOk, box}
+let settings  = storage.get('sai-quiz-settings', { scale:1, highContrast:false, reduceMotion:false });
+
   mode: 'home', // home | quiz | manage | help
   run: null,    // {modeLabel, list, index, chapter}
   trophies: storage.get('sai-quiz-trophies', {}),
