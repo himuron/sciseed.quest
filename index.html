@@ -252,6 +252,20 @@ input.choice::placeholder,
 textarea.choice::placeholder {
   color: rgba(255,255,255,.7);
 }
+/* --- ページ背景を固定要素に集約（帯対策） --- */
+.page-bg{
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* 明るめグラデーションを一枚に固定 */
+  background: linear-gradient(180deg, #17355c 0%, #254b7a 100%);
+  will-change: transform;           /* Safari帯対策 */
+  transform: translateZ(0);         /* 帯の出やすい環境での再描画最適化 */
+}
+
+/* body本体は背景を持たせない（下の.page-bgを透過させる） */
+body{ background: transparent !important; }
 
   </style>
   <!-- CSV & Excel parsers -->
@@ -261,6 +275,8 @@ textarea.choice::placeholder {
 </head>
 <body>
   <div class="big-mark" id="bigMark" aria-hidden="true"></div>
+  <div class="page-bg" aria-hidden="true"></div>
+
   <div class="container">
     <div class="topbar">
       <div class="logo"><span class="dot"></span> sAI 学習クイズ</div>
