@@ -314,6 +314,11 @@ body{ background: transparent !important; }
   <!-- CSV & Excel parsers -->
 　<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Firebase（compat版：差分最小で導入） -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
 
 </head>
 <body>
@@ -328,6 +333,9 @@ body{ background: transparent !important; }
         <span class="tag" id="statusTag">HOME</span>
         <button class="btn ghost" id="manageBtn">問題管理</button>
         <button class="btn ghost" id="helpBtn">ヘルプ/CSVテンプレート</button>
+        <button class="btn ghost" id="accountBtn">ログイン</button>
+<span class="tag" id="accountInfo" aria-live="polite"></span>
+
       </div>
     </div>
 
@@ -504,8 +512,8 @@ function setSavedAt(){
 const ADMIN_MODE = false; // ← 管理者用ビルドのみ true に（JS公開でのパスワード運用は不可）
 
 // Googleスプレッドシートを CSV として公開したURL（例）
-const REMOTE_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/export?format=csv&gid=0";
+const REMOTE_CSV_URL = ""; // Firestore運用に移行
+
 
 // 何秒おきに更新を取りに行くか（例：60秒）
 const REMOTE_POLL_MS = 60000;
@@ -1070,7 +1078,7 @@ byId('exportBtn').onclick = exportCurrent;
 byId('downloadTemplateBtn').onclick = downloadTemplate; byId('downloadTemplateBtn2').onclick = downloadTemplate;
 byId('downloadXlsxTemplateBtn').onclick = downloadXlsxTemplate; byId('downloadXlsxTemplateBtn2').onclick = downloadXlsxTemplate;
 setupAdminUI();
-startRemoteSync();
+
 
 /*******************************\n * 初期表示
  *******************************/
