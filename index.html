@@ -954,22 +954,34 @@ function cell(key, value, idx, readonly=false, max=0){
 }
 
 
-function onCellChange(e){
+async function onCellChange(e){
   const el=e.target; const idx=+el.dataset.idx; const key=el.dataset.key; const v=el.value;
-  questions[idx][key]=v; if(key==='id') questions[idx].id = isFinite(+v)? +v : v; 
-  // ユニークID保証
-  if(key==='id'){
-    const ids=questions.map(q=>q.id); const dups=ids.filter((x, i)=> ids.indexOf(x)!==i);
-    if(dups.length){ alert('IDが重複しています。ユニークになるよう修正してください。'); }
-  }
+  if(!(currentRole==='admin' || currentRole==='editor')){ alert('編集権限がありません'); return }
+  questions[idx][key]=v; if(key==='id') questions[idx].id = isFinite(+v)? +v : v;
   saveAll();
+  const q = questions[idx]; const docId = String(q.id);
+  try{
+    await db.collection('questions').doc(docId).set({
+      ...q, id:q.id, ownerUid: currentUser?.uid||'',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  }catch(err){ console.error(err); alert('保存に失敗しました') }
 }
 
-byId('addRowBtn').onclick = ()=>{
+
+byId('addRowBtn').onclick = async ()=>{
+  if(!(currentRole==='admin' || currentRole==='editor')){ alert('追加の権限がありません'); return }
   const nextId = genNextId();
-  questions.push({ id: nextId, chapter:'新規章', field:'共通', type:'choice', question:'新規問題', choice1:'選択肢1', choice2:'選択肢2', choice3:'選択肢3', choice4:'選択肢4', correct:'1', answer_pattern:'', explanation:'' });
-  saveAll(); renderTable(); refreshHome();
-}
+  const q = { id: nextId, chapter:'新規章', field:'共通', type:'choice', question:'新規問題',
+    choice1:'選択肢1', choice2:'選択肢2', choice3:'選択肢3', choice4:'選択肢4', correct:'1', answer_pattern:'', explanation:'' };
+  try{
+    await db.collection('questions').doc(String(nextId)).set({
+      ...q, ownerUid: currentUser?.uid||'',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }catch(e){ console.error(e); alert('追加に失敗しました') }
+};
+
 
 function genNextId(){
   const ids=questions.map(q=> typeof q.id==='number'? q.id : 0);
