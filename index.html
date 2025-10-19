@@ -309,6 +309,9 @@ body{ background: transparent !important; }
   .hero{ padding: 12px 84px 8px 12px; }
   .mascot-hero{ width: 72px; }
 }
+/* Auth Modal */
+#authModal{ position: fixed; inset:0; z-index: 50; background: rgba(0,0,0,.45); display:grid; place-items:start center; padding:12px; }
+#authModal.hidden{ display:none; }
 
   </style>
   <!-- CSV & Excel parsers -->
@@ -373,7 +376,7 @@ body{ background: transparent !important; }
       <div class="card">
         <div class="section-title">データの入出力</div>
         <div class="grid">
-          <div class="controls" id="adminImport">  <!-- 管理者だけ表示 -->
+          <div class="controls" id="adminImport">
   <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" />
   <button class="btn" id="importBtn">アップロードして置き換え</button>
   <button class="btn" id="mergeBtn">アップロードして追加/更新</button>
@@ -384,6 +387,7 @@ body{ background: transparent !important; }
 <div class="controls">
   <span class="tag" id="syncTag">同期：未接続</span>
 </div>
+
 <div id="lastSaved" class="muted" style="font-size:12px"></div>
 
         </div>
@@ -432,6 +436,24 @@ body{ background: transparent !important; }
     </section>
 
     <!-- MANAGE -->
+    <!-- Auth Modal -->
+<div id="authModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="card" style="max-width:420px;margin:10vh auto;">
+    <div class="section-title" id="authTitle">アカウント</div>
+    <div class="grid" style="gap:8px">
+      <input id="authEmail" class="choice" placeholder="メールアドレス" inputmode="email" autocomplete="email">
+      <input id="authPass"  class="choice" placeholder="パスワード" type="password" autocomplete="current-password">
+      <div class="controls">
+        <button class="btn primary" id="loginBtn">ログイン</button>
+        <button class="btn" id="signupBtn">新規登録</button>
+        <button class="btn ghost" id="resetBtn">パスワード再設定</button>
+        <button class="btn ghost" id="closeAuthBtn">閉じる</button>
+      </div>
+      <div class="muted" id="authMsg" style="font-size:12px"></div>
+    </div>
+  </div>
+</div>
+
     <section id="manage" class="hidden">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:end; gap:10px; flex-wrap:wrap">
@@ -517,6 +539,20 @@ const REMOTE_CSV_URL = ""; // Firestore運用に移行
 
 // 何秒おきに更新を取りに行くか（例：60秒）
 const REMOTE_POLL_MS = 60000;
+/***** Firebase 設定（あなたの値に置換） *****/
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID",
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+/***** 権限：users/{uid}.role = 'admin' | 'editor' | 'viewer' *****/
+let currentUser = null;
+let currentRole = 'viewer';
 
 /*******************************\n * 初期データ（サンプル）
  *******************************/
@@ -1017,6 +1053,7 @@ function downloadXlsxTemplate(){
  *******************************/
 function byId(id){ return document.getElementById(id) }
 function escapeHtml(s){ return String(s).replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]) }
+  
 // 簡易ハッシュ
 function hashString(s){ let h=0; for(let i=0;i<s.length;i++){ h=((h<<5)-h)+s.charCodeAt(i); h|=0 } return h }
 
