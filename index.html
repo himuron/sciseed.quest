@@ -1009,6 +1009,50 @@ function downloadXlsxTemplate(){
  *******************************/
 function byId(id){ return document.getElementById(id) }
 function escapeHtml(s){ return String(s).replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]) }
+// 簡易ハッシュ
+function hashString(s){ let h=0; for(let i=0;i<s.length;i++){ h=((h<<5)-h)+s.charCodeAt(i); h|=0 } return h }
+
+// 管理者UIの表示/非表示
+function setupAdminUI(){
+  const el = byId('adminImport');
+  if(el) el.classList.toggle('hidden', !ADMIN_MODE);
+}
+
+// リモートからCSVを取得して反映（変更がある時だけ置換）
+let remoteLastHash = storage.get('sai-quiz-remote-hash', null);
+let remoteTimer = null;
+
+async function fetchRemoteCsv(){
+  const tag = byId('syncTag'); if(tag) tag.textContent = '同期：取得中…';
+  try{
+    const res = await fetch(REMOTE_CSV_URL, {cache:'no-store'});
+    if(!res.ok) throw new Error(res.statusText);
+    const text = await res.text();
+    const h = String(hashString(text));
+    if(h !== remoteLastHash){
+      const arr = parseCsvText(text).filter(q=> (q.question||'').trim() && ['choice','free'].includes(q.type));
+      if(arr.length){
+        replaceQuestions(arr);
+        remoteLastHash = h;
+        storage.set('sai-quiz-remote-hash', remoteLastHash);
+        saveAll();
+        renderTable?.();   // 管理画面を開いていたら再描画
+        refreshHome?.();   // ホームの分野/トロフィー更新
+      }
+    }
+    if(tag) tag.textContent = '同期：最新';
+  }catch(e){
+    if(tag) tag.textContent = '同期：エラー';
+    console.error('Remote sync failed:', e);
+  }
+}
+
+function startRemoteSync(){
+  if(!REMOTE_CSV_URL) return;
+  fetchRemoteCsv(); // 初回
+  clearInterval(remoteTimer);
+  remoteTimer = setInterval(fetchRemoteCsv, REMOTE_POLL_MS);
+}
 
 /*******************************\n * イベント配線
  *******************************/
