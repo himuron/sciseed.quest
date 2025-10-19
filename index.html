@@ -618,6 +618,32 @@ const state = storage.get('sai-quiz-state', {
 });
 
 let questions = storage.get('sai-quiz-questions', sampleQuestions);
+let unsubscribeQs = null;
+function mapDocToQuestion(d){
+  const x = d.data();
+  return {
+    id: x.id ?? d.id, chapter: x.chapter||'未設定', field: x.field||'共通', type: x.type||'choice',
+    question: x.question||'', choice1: x.choice1||'', choice2: x.choice2||'', choice3: x.choice3||'', choice4: x.choice4||'',
+    correct: x.correct||'', answer_pattern: x.answer_pattern||'', explanation: x.explanation||'',
+    ownerUid: x.ownerUid||'', updatedAt: x.updatedAt||null
+  };
+}
+function subscribeQuestions(){
+  if(unsubscribeQs) unsubscribeQs();
+  unsubscribeQs = db.collection('questions').orderBy('id').onSnapshot(snap=>{
+    const arr=[]; snap.forEach(doc=> arr.push(mapDocToQuestion(doc)));
+    if(arr.length){
+      questions = arr; saveAll();
+      if(state.mode==='manage') renderTable();
+      refreshHome();
+      if(state.mode==='quiz' && state.run) renderQuiz();
+    }
+    const tag = byId('syncTag'); if(tag) tag.textContent = '同期：最新（Firestore）';
+  }, err=>{
+    const tag = byId('syncTag'); if(tag) tag.textContent = '同期：エラー（Firestore）';
+    console.error(err);
+  });
+}
 
 function saveAll(){
   storage.set('sai-quiz-questions', questions);
