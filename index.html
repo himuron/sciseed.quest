@@ -1055,16 +1055,28 @@ function mergeQuestions(newQs){
 function replaceQuestions(newQs){ questions = newQs }
 
 async function handleImport(mode){
+  if(currentRole!=='admin'){ alert('インポートは管理者のみ可能です'); return }
   const input = byId('fileInput'); const file = input.files && input.files[0];
   if(!file){ alert('CSV または Excel ファイルを選択してください'); return }
   const ext = file.name.split('.').pop().toLowerCase();
   try{
     const arr = (ext==='csv') ? parseCsvText(await readFileToText(file)) : await parseXlsx(file);
     const cleaned = arr.filter(q=> (q.question||'').trim().length>0 && ['choice','free'].includes(q.type));
-    if(mode==='replace') replaceQuestions(cleaned); else mergeQuestions(cleaned);
-    saveAll(); renderTable(); refreshHome(); alert(`${cleaned.length}件を${mode==='replace'?'置き換え':'追加/更新'}しました。`)
+    const batch = db.batch();
+    if(mode==='replace'){
+      const snap = await db.collection('questions').get();
+      snap.forEach(d=> batch.delete(d.ref));
+    }
+    cleaned.forEach(q=>{
+      const ref = db.collection('questions').doc(String(q.id || genNextId()));
+      batch.set(ref, { ...q, id:q.id, ownerUid: currentUser?.uid||'',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, {merge:true});
+    });
+    await batch.commit();
+    alert(`${cleaned.length}件を${mode==='replace'?'置き換え':'追加/更新'}しました。`);
   }catch(e){ console.error(e); alert('読み込みに失敗しました。ファイル形式とヘッダーを確認してください。') }
 }
+
 
 function downloadCsv(filename, rows){
   const header = ['id','chapter','field','type','question','choice1','choice2','choice3','choice4','correct','answer_pattern','explanation'];
