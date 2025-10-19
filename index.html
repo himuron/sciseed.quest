@@ -365,15 +365,19 @@ body{ background: transparent !important; }
       <div class="card">
         <div class="section-title">データの入出力</div>
         <div class="grid">
-          <div class="controls">
-            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" />
-            <button class="btn" id="importBtn">アップロードして置き換え</button>
-            <button class="btn" id="mergeBtn">アップロードして追加/更新</button>
-            <button class="btn" id="exportBtn">現在の問題をCSVで書き出し</button>
-            <button class="btn" id="downloadTemplateBtn">CSVテンプレートをダウンロード</button>
-            <button class="btn" id="downloadXlsxTemplateBtn">Excelテンプレート(.xlsx)</button>
-          </div>
-          <div id="lastSaved" class="muted" style="font-size:12px"></div>
+          <div class="controls" id="adminImport">  <!-- 管理者だけ表示 -->
+  <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" />
+  <button class="btn" id="importBtn">アップロードして置き換え</button>
+  <button class="btn" id="mergeBtn">アップロードして追加/更新</button>
+  <button class="btn" id="exportBtn">現在の問題をCSVで書き出し</button>
+  <button class="btn" id="downloadTemplateBtn">CSVテンプレートをダウンロード</button>
+  <button class="btn" id="downloadXlsxTemplateBtn">Excelテンプレート(.xlsx)</button>
+</div>
+<div class="controls">
+  <span class="tag" id="syncTag">同期：未接続</span>
+</div>
+<div id="lastSaved" class="muted" style="font-size:12px"></div>
+
         </div>
       </div>
     </section>
