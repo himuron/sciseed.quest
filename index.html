@@ -515,6 +515,26 @@ body{ background: transparent !important; }
   </div>
 
 <script>
+  byId('closeAuthBtn').onclick = ()=> showAuth(false);
+byId('accountBtn').onclick   = ()=> showAuth(true);
+
+async function doAuth(kind){
+  const email = byId('authEmail').value.trim();
+  const pass  = byId('authPass').value;
+  const msg   = byId('authMsg'); msg.textContent = '処理中…';
+  try{
+    if(kind==='login')  await auth.signInWithEmailAndPassword(email, pass);
+    if(kind==='signup'){ const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      await db.collection('users').doc(cred.user.uid).set({email, role:'viewer', createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    }
+    if(kind==='reset')  await auth.sendPasswordResetEmail(email);
+    msg.textContent = '完了しました'; showAuth(false);
+  }catch(e){ msg.textContent = `エラー：${e.message}`; }
+}
+byId('loginBtn').onclick  = ()=> doAuth('login');
+byId('signupBtn').onclick = ()=> doAuth('signup');
+byId('resetBtn').onclick  = ()=> doAuth('reset');
+
 /*******************************\
  * 小さなストレージユーティリティ
 \*******************************/
@@ -1053,6 +1073,39 @@ function downloadXlsxTemplate(){
  *******************************/
 function byId(id){ return document.getElementById(id) }
 function escapeHtml(s){ return String(s).replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]) }
+
+function setupRoleUI(){
+  const manageBtn = byId('manageBtn');
+  const adminImport = byId('adminImport');
+  if(manageBtn)  manageBtn.classList.toggle('hidden', !(currentRole==='admin' || currentRole==='editor'));
+  if(adminImport) adminImport.classList.toggle('hidden', !(currentRole==='admin'));
+}
+
+function showAuth(open){ byId('authModal').classList.toggle('hidden', !open) }
+
+auth.onAuthStateChanged(async (user)=>{
+  currentUser = user || null;
+  const info = byId('accountInfo');
+  const btn  = byId('accountBtn');
+  if(user){
+    try{
+      const uref = db.collection('users').doc(user.uid);
+      const snap = await uref.get();
+      currentRole = (snap.exists && snap.data().role) ? snap.data().role : 'viewer';
+    }catch(e){ currentRole = 'viewer' }
+    if(info) info.textContent = `${user.email} / ${currentRole}`;
+    if(btn){ btn.textContent = 'ログアウト'; btn.onclick = ()=> auth.signOut() }
+    setupRoleUI();
+    subscribeQuestions();
+  }else{
+    currentRole = 'viewer';
+    if(info) info.textContent = '';
+    if(btn){ btn.textContent = 'ログイン'; btn.onclick = ()=> showAuth(true) }
+    setupRoleUI();
+    subscribeQuestions();
+  }
+});
+
   
 // 簡易ハッシュ
 function hashString(s){ let h=0; for(let i=0;i<s.length;i++){ h=((h<<5)-h)+s.charCodeAt(i); h|=0 } return h }
