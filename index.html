@@ -500,6 +500,15 @@ function setSavedAt(){
   if(!el) return; const now = new Date();
   el.textContent = `保存: ${now.toLocaleString()}`;
 }
+/***** 管理者モードとリモート同期設定（必要に応じて変更） *****/
+const ADMIN_MODE = false; // ← 管理者用ビルドのみ true に（JS公開でのパスワード運用は不可）
+
+// Googleスプレッドシートを CSV として公開したURL（例）
+const REMOTE_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/export?format=csv&gid=0";
+
+// 何秒おきに更新を取りに行くか（例：60秒）
+const REMOTE_POLL_MS = 60000;
 
 /*******************************\n * 初期データ（サンプル）
  *******************************/
